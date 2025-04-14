@@ -34,3 +34,61 @@ json_obj = json.loads(data)
 
 place_id = json_obj["results"][0]["place_id"]
 print("Place id", place_id)
+
+-----------------------------------------------------------------------------------------------------------------------------
+# Another code-
+# Assignment 13 --Using Python to Access Web Data -- Calling a JSON API
+
+import urllib.request as ur
+import urllib.parse as up
+import json, ssl
+
+#  South Federal University  -- Plus code 6FV8QPRJ+VQ
+#  federal institute of tecnology and education from southeastern Minas Gerais
+
+# Heavily rate limited proxy of https://www.geoapify.com/ api
+serviceurl = 'https://py4e-data.dr-chuck.net/opengeo?'
+
+# Ignore SSL certificate errors
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
+while True:
+    address = input('Enter location: ')
+    if len(address) < 1: 
+        break
+    address = address.strip()
+    parms = dict()
+    parms['q'] = address
+
+    url = serviceurl + up.urlencode(parms)
+    print('Retrieving', url)
+
+    #data = ur.urlopen(url).read().decode('utf-8')
+    uh = ur.urlopen(url, context=ctx)
+    data = uh.read().decode()
+    print('Retrieved', len(data), 'characters', data[:100].replace('\n', ' '))
+    #This will print 100 charactor of the data
+
+    try:
+        # json_obj = json.loads(data)
+        js = json.loads(data)
+    except:
+        js = None
+    
+    if not js or 'features' not in js:
+        print('==== Download error ===')
+        print(data)
+        break
+
+    if len(js['features']) == 0:
+        print('==== Object not found ====')
+        print(data)
+        break
+    elif len(js['features']) ==1:
+        print('==== Single Arrey objects found ====')
+    
+    plus_code = js["features"][0]['properties']["plus_code"]
+    print("plus_code", plus_code)
+-------------------------------------------------------------------------------------------------------------------------------------
